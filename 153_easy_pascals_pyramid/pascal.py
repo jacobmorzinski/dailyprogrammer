@@ -7,7 +7,7 @@ import argparse
 import sys
 import collections
 import logging
-logging.basicConfig(level=logging.DEBUG)
+#logging.basicConfig(level=logging.DEBUG)
 
 def triangle(n):
     '''Return a Pascal's Triangle'''
@@ -36,46 +36,51 @@ def triangle(n):
         fmt = lambda x: '{:4}'.format(x) # pad input into 4-wide string
         output.append( ' '.join(map(fmt,row.values())) )
     return '\n'.join(output)
-
     
 
-class AutoViviDict(dict):
-    def __getitem__(self,item):
-        try:
-            return dict.__getitem__(self,item)
-        except KeyError:
-            value = self[item] = type(self)()
-            return value
+def dict_int_factory():
+    return collections.defaultdict(int)
+
+def dict_dict_int_factory():
+    return collections.defaultdict(dict_int_factory)
 
 def pyramid(n):
     '''Return a Pascal's Pyramid'''
     # For generation N,
     # child[x,y] = parent[x,y] + parent[x,y-1] + parent[x-1,y-1]
 
-    return 0
-    #crash and burn
+
     planes = []
     for plane in xrange(n):
         if plane==0:
-            child = AutoViviDict()
-            child[0] = 1
+            child = dict_dict_int_factory()
+            child[0][0] = 1
         else:
             parent = planes[plane-1]
-            child = AutoViviDict()
+            child = dict_dict_int_factory()
             for i in xrange(plane+1):
-                child[i] = parent[i] + parent[i-1]
+                logging.debug("i is {}".format(i))
+                logging.debug(parent)
+                for j in xrange(i+1):
+                    child[j][i] = parent[j][i] + parent[j][i-1] + parent[j-1][i-1]
+                logging.debug(child)
             # Child is done.  Remove zeros that were created in parent.
-            for k in parent.keys():
-                if parent[k] == 0:
-                    del(parent[k])
-        print child
+            for i in parent.keys():
+                for j in parent[i].keys():
+                    if parent[i][j] == 0:
+                        del(parent[i][j])
+                if parent[i] == {}:
+                    del(parent[i])
+        logging.debug(child.items())
         planes.append(child)
         # end: for plane in xrange(n)
 
     output = []
-    for plane in planes:
+    result = planes[-1]
+    for i in xrange(n):
         fmt = lambda x: '{:4}'.format(x) # pad input into 4-wide string
-        output.append( ' '.join(map(fmt,plane.values())) )
+        output.append( ' '.join(map(fmt,result[i].values())) )
+    output.reverse()
     return '\n'.join(output)
 
 
@@ -97,7 +102,7 @@ def main():
     n = res.number
     if n is None:
         prompt = "What is N: " if sys.stdin.isatty() else ""
-        n = raw_input(prompt)
+        n = int(raw_input(prompt))
 
     if res.mode == 'triangle':
         print triangle(n)
