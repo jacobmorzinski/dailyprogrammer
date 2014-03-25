@@ -21,7 +21,7 @@ def main():
     score = names.score
     if score is None:
         prompt = ""
-        if sys.stdin.isatty() and sys.platform != 'win32':
+        if sys.stdin.isatty() and sys.platform != 'cli':
             prompt = "What is the score: "
         score = int(raw_input(prompt))
     logging.debug("score is {}".format(score))
