@@ -79,15 +79,13 @@ let solve ( s: string ) =
     let ( ed : string [] ) = s.Split([|' '|], 2)
     match ed with
         | [|"e"; p|] -> a85encode p
-        // | [|"d"; c|] -> a85decode c
+        | [|"d"; c|] -> a85decode c
         | _ -> failwith ("Not Valid: " + s)
 
 let main() =
     let lines = readlines()
-    // let results =
-    //     Seq.map solve lines
-    // Seq.iter ( printfn "%A" ) results
-
-    printfn "%A" ( a85decode "87cURD_*#TDfTZ)+TOAZ" )
+    let results =
+        Seq.map solve lines
+    Seq.iter ( printfn "%A" ) results
 
 main()
